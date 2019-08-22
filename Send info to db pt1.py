@@ -2,7 +2,7 @@
 """
 Created on Thu Aug 22 15:07:13 2019
 
-@author: MEHAK
+@author: Mehak Shandilya
 """
 
 from mysql.connector import MySQLConnection, Error
