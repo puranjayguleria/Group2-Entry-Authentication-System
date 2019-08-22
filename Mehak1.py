@@ -2,34 +2,34 @@
 """
 Created on Thu Aug 22 12:28:47 2019
 
-@author: MUJ
+@author: Mehak Shandilya
 """
 
 import cv2
-import sys
-from time import sleep
+import time
 
-key = cv2.waitKey(1)
-webcam = cv2.VideoCapture(0)
-sleep(2)
-while True:
+camera_port = 0;
+fps = 30;
+ramp_frames = 30;
+
+camera = cv2.VideoCapture(camera_port)
+
+def get_image():
+    retval, im = camera.read()
+    return im
+
+#for i in xrange(ramp_frames):
+    #temp = get_image()
+print("Taking image...")
+time.sleep(4)
+camera_capture = get_image()
+file ="test_image.jpg"
+cv2.imwrite(file,camera_capture)
+
+time.sleep(4)
     
-    check,frame = webcam.read()
-    print(check)
-    print(frame)
-    cv2.imshow("Capturing", frame)
-    key = cv2.waitKey(1)
-    if key == ord('s'):
-        cv2.imwrite(filename = 'saved_webcam_img.jpg', img = frame)
-        webcam.release()
-        print("Image clicked and saved...")
-        break
-    elif key == ord('q'):
-        webcam.release()
-        cv2.destroyAllWindows()
-        break
-
-
+    
+del(camera)
 
 
 
