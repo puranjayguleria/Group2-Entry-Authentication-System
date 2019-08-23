@@ -52,7 +52,7 @@ public class SerialGUI extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		
-		label = new JLabel("Please scan your badge");
+		label = new JLabel("Please scan your card");
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -82,7 +82,7 @@ public class SerialGUI extends JFrame {
 	
 
 	void initializeSerialPort() {
-		System.out.println("Connecting to "+commPort+" with speed "+baudrate+" (check these from Arduino IDE!)");
+		System.out.println("Connecting to "+commPort+" with speed "+baudrate);
 		comPort = SerialPort.getCommPort(commPort);
 		comPort.openPort();
 		comPort.setBaudRate(baudrate);
@@ -115,7 +115,7 @@ public class SerialGUI extends JFrame {
 					numRead = temp;
 					
 				
-				System.out.println("Read " + numRead + " bytes.");
+				System.out.println("Read " + numRead + " bytes");
 				
 				if (numRead > 0) {
 					
@@ -132,8 +132,6 @@ public class SerialGUI extends JFrame {
 										o++;
 										receive(readline);
 									}
-									
-								//comPort.setComPortTimeouts(TIMEOUT_READ_BLOCKING, -3000, 0);
 								
 								}
 							readline="";
@@ -158,8 +156,7 @@ public class SerialGUI extends JFrame {
 		if (line.startsWith("aRFID TAG ID")) { // check for a value (string starting with 'Card UID')
 			try {
 				System.out.println("entered trimming");
-				cuid(line.substring(10).trim());
-				
+				cuid(line.substring(10).trim());	
 				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -190,10 +187,9 @@ public class SerialGUI extends JFrame {
 		System.out.println("cuid="+id+".");
 		String welcome = "Welcome, ";
 		
-		String command = "/Users/puranjay/Desktop/door_sensor.py";
+		String command = "/Users/puranjay/Desktop/base.py";
 		if (id.equals("ID:F2 7A 4E 43 >>")) 
 		{
-			//****insert code here***//
 			o++;
 			System.out.println("***Code Begins***");
 			try {
@@ -215,20 +211,11 @@ public class SerialGUI extends JFrame {
 				}
 				BufferedReader bfr = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				String line = "";
-				/*while((line = bfr.readLine()) != null) {
-				// display each output line form python script
-				System.out.println(line);
-				}*/
-				//p.waitFor();
-				//p.destroy();
-				System.out.println("BAWA o SET HO GAYA");
-				//Thread.sleep(2000);
 				causedelay delay=new causedelay();
 				t=new Thread(delay);
 				t.start();
 				System.out.println("System back ");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}			
 			
@@ -250,13 +237,10 @@ class causedelay implements Runnable
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("setting o to 0");
 		SerialGUI s=new SerialGUI(0);
 		return;		
-	}
-	
-	
+	}	
 }
