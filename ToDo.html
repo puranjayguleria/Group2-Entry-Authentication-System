@@ -39,13 +39,14 @@ body {
 
 /* Style the input */
 input {
-  margin: 0;
+  margin-bottom: 20px;
   border: none;
   border-radius: 0;
   width: 100%;
   padding: 10px;
   float: left;
   font-size: 16px;
+
 }
 
 
@@ -58,6 +59,8 @@ input {
   <center>
   <form method="POST" name="form" action="{{ url_for('todo') }}">
   <input type="text" name="task" id="task" placeholder="Task..."/>
+
+  <input type="text" name="emails" id="emails" placeholder="Email..."/>
   <button type="submit" class="submit">submit</button>
  </form>
 </center>
