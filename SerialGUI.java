@@ -17,13 +17,14 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 
+
+
 public class SerialGUI extends JFrame {
 
 	private JPanel contentPane;
 	private JLabel label;
-	public static int o=0;
+	private int o=0;
 	 Thread t;
-	 static final public int TIMEOUT_READ_BLOCKING = 0x00000010;
 
 	/**
 	 * Launch the application.
@@ -51,8 +52,8 @@ public class SerialGUI extends JFrame {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		
-		label = new JLabel("Please scan your card");
+
+		label = new JLabel("Please scan your badge");
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -77,10 +78,9 @@ public class SerialGUI extends JFrame {
 	// used for serial communication:
 	String readline;
 	SerialPort comPort;
-	String commPort = "/dev/tty.usbmodem1421";
+	String commPort = "COM7";
 	int baudrate = 9600;
 	
-
 	void initializeSerialPort() {
 		System.out.println("Connecting to "+commPort+" with speed "+baudrate);
 		comPort = SerialPort.getCommPort(commPort);
@@ -89,15 +89,12 @@ public class SerialGUI extends JFrame {
 		comPort.addDataListener(new SerialPortDataListener() {
 			@Override
 			public int getListeningEvents() {
-				
 				return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
 			}
-
 			@Override
 			public void serialEvent(SerialPortEvent event) {
 				if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE) {
 					System.err.println("No data on SerialPort");
-					
 					return;
 				}
 				int bytesAvailable = comPort.bytesAvailable();
@@ -105,37 +102,22 @@ public class SerialGUI extends JFrame {
 					System.err.println("Can not read from SerialPort");
 					return;
 				}
-				//System.out.println("len of bytes avail:"+bytesAvailable);
 				byte[] newData = new byte[bytesAvailable];
-				int numRead=0;
-				
-				int temp=comPort.readBytes(newData, bytesAvailable);
-				
-					
-					numRead = temp;
-					
-				
-				System.out.println("Read " + numRead + " bytes");
-				
+				int numRead = comPort.readBytes(newData, newData.length);
+				 System.out.println("Read " + numRead + " bytes");
 				if (numRead > 0) {
-					
+					o++;
 					for (int i = 0; i < newData.length; ++i) {
-						System.out.println((char)(newData[i]));
 						if (((char)newData[i]=='\n'||(char)newData[i]=='\r')) {
 							readline=readline.trim();
-							
 							if (readline.length()>0) 
 								{
-									System.out.println("value of o="+o);
-									if(o==1 || o==0)
-									{
-										o++;
-										receive(readline);
-									}
+								System.out.println("Entered recieve");
+								receive(readline);
+								
 								
 								}
 							readline="";
-							
 							break;
 						}
 						else
@@ -152,32 +134,16 @@ public class SerialGUI extends JFrame {
 	 */
 	public void receive(String line) {
 		if (line==null) return;
-		System.out.println(line+"value of o"+o);
-		if (line.startsWith("aRFID TAG ID")) { // check for a value (string starting with 'Card UID')
+		System.out.println(line);
+		if (line.startsWith("RFID TAG ID")) { // check for a value (string starting with 'Card UID')
 			try {
-				System.out.println("entered trimming");
-				cuid(line.substring(10).trim());	
-				
+				cuid(line.substring(10).trim());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} // show it in the label in the userinterface
+			} 
 		}
 	}
-	
-	/**
-	 * Send text to the serial connection.
-	 * @param line
-	 */
-	public void send(String s) {
-		comPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
-		comPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 100, 0);
-		try{Thread.sleep(5);} catch(Exception e){}
-		PrintWriter pout = new PrintWriter(comPort.getOutputStream());
-		pout.print(s);
-		pout.flush();
-	}
-	
 	/**
 	 * This method will be called with the id if the SerialComm finds the keyword "Card UID"
 	 * @param id
@@ -187,45 +153,42 @@ public class SerialGUI extends JFrame {
 		System.out.println("cuid="+id+".");
 		String welcome = "Welcome, ";
 		
-		String command = "/Users/puranjay/Desktop/base.py";
-		if (id.equals("ID:F2 7A 4E 43 >>")) 
+		String true_command = "python C:\\Users\\MUJ\\Desktop\\TechSys\\backend\\base.py puranjay 1";
+		String false_command = "pythonC:\\Users\\MUJ\\Desktop\\TechSys\\backend\\base.py abc 0";
+		if (id.equals("D:F3 50 D0 2D")) 
 		{
 			o++;
 			System.out.println("***Code Begins***");
 			try {
 				
-				ProcessBuilder pb = new ProcessBuilder("/Library/Frameworks/Python.framework/Versions/3.5/bin/python3", command);
-				Process p = pb.start();
-				int exitCode = p.waitFor();
-				System.out.println("exit code:"+exitCode);
-				command="/Users/puranjay/Desktop/email1.py";
-				ProcessBuilder pb1 = new ProcessBuilder("/Library/Frameworks/Python.framework/Versions/3.5/bin/python3", command);
-				Process p1 = pb1.start();
-				int exitCode1 = p1.waitFor();
-				System.out.println("exit code:"+exitCode);
-				int len;
-				if ((len = p.getErrorStream().available()) > 0) {
-				  byte[] buf = new byte[len]; 
-				  p.getErrorStream().read(buf); 
-				  System.err.println("Command error:\t\""+new String(buf)+"\""); 
-				}
+			    Process p = Runtime.getRuntime().exec(true_command);			
 				BufferedReader bfr = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				String line = "";
-				causedelay delay=new causedelay();
-				t=new Thread(delay);
-				t.start();
+				p.waitFor();
+				p.destroy();
+				
 				System.out.println("System back ");
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}			
-			
+			}
+			causedelay cause=new causedelay();
+			   t = new Thread(cause);
+			  t.start();
+		}
+		else {
+			try {
+			Process p = Runtime.getRuntime().exec(false_command);
+			}
+			catch(IOException e) {
+				
+			}
 			
 		}
 		}
 	public SerialGUI(int val)
 	{
-		o=0;
-		System.out.println("o is set to zero");
+		o=val;
 	}
 	}
 class causedelay implements Runnable
@@ -237,10 +200,12 @@ class causedelay implements Runnable
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("setting o to 0");
 		SerialGUI s=new SerialGUI(0);
-		return;		
-	}	
+		return;
+		
+	}
 }
